@@ -29,6 +29,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    
     @GetMapping("/me")
     public ResponseEntity<User> authenticatedUser() {
         logger.info("inicia authenticatedUser");
