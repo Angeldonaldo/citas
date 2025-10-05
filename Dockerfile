@@ -1,22 +1,15 @@
-# Etapa 1: Build con Maven y JDK 21
-FROM eclipse-temurin:21-jdk AS builder
+# Etapa de build
+FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
-
-# Copia todo el proyecto
-COPY . .
-
-# Compila el proyecto (genera target/*.jar)
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY src src
 RUN ./mvnw clean package -DskipTests
 
-# Etapa 2: Runtime liviano
-FROM eclipse-temurin:21-jre
+# Etapa de ejecución
+FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
-
-# Copiar el jar desde la etapa de build
-COPY --from=builder /app/target/*.jar app.jar
-
-# Puerto de Spring Boot
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-# Arranque de la aplicación
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
